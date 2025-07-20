@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Our Services - Future Bright{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Our Services</h1>
+  <p class="lead text-secondary">
+    At Future Bright Infotech, we offer a wide range of educational services to help you succeed.
+  </p>
+
+  <ul class="list-group list-group-flush mb-4 fs-5">
+    <li class="list-group-item">📚 Comprehensive Programming Courses</li>
+    <li class="list-group-item">👩‍🏫 Expert-led Workshops and Mentorship</li>
+    <li class="list-group-item">💼 Career Counseling and Job Placement Assistance</li>
+    <li class="list-group-item">🖥️ Corporate Training & Customized Programs</li>
+    <li class="list-group-item">🎓 Certification and Skill Development</li>
+  </ul>
+
+  <p>
+    Interested? <a href="{% url 'contact' %}" class="text-primary text-decoration-underline">Contact us</a> to learn more.
+  </p>
+</div>
+{% endblock %}

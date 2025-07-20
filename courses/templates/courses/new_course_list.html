@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Courses{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'courses/style.css' %}">
+{% endblock %}
+
+{% block body_class %}course-body{% endblock %}
+
+{% block content %}
+  <section class="text-center my-5">
+    <h1 class="course-heading">Explore Our Courses</h1>
+    <p class="course-subheading">Learn new skills to upgrade your career. Choose from our best offerings.</p>
+  </section>
+
+  <div class="course-container">
+    {% for course in courses %}
+      <div class="course-card">
+        {% if course.image %}
+          <img src="{{ course.image.url }}" alt="{{ course.title }}" style="width:100%; border-radius: 8px; margin-bottom: 15px;">
+        {% endif %}
+        <h4 class="course-title">{{ course.title }}</h4>
+        <div class="course-meta">
+          <span class="badge bg-primary">{{ course.category }}</span>
+          <span class="price">₹{{ course.price }}</span>
+        </div>
+        <p class="course-description">{{ course.description }}</p>
+      </div>
+    {% empty %}
+      <p class="text-center text-muted">No courses available at the moment.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

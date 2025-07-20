@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/custom_admin.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
+    <title>Future Bright Admin</title>
+{% endblock %}
+
+{% block branding %}
+    <div id="custom-branding">
+        <img src="{% static 'images/logo.png' %}" alt="Future Bright Logo" style="height:40px; vertical-align: middle;">
+        <h1 id="site-name"><a href="{% url 'admin:index' %}">Future Bright Admin</a></h1>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div class="custom-footer">
+        <p>Powered by <strong>Future Bright</strong> | © {% now "Y" %} | <a href="mailto:info@futurebrightinfotech.com">Support</a></p>
+    </div>
+{% endblock %}

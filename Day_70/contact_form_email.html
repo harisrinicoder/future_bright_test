@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Future Bright Institute - Contact Form with SMTP Email</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+    }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .example {
+      background-color: #f0f4f8;
+      border: 1px solid #c0d7ea;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">Future Bright Institute</header>
+
+  <h1>📬 Django Contact Form with Email Sending via SMTP</h1>
+
+  <div class="highlight">
+    Learn how to create a contact form in Django that sends emails using SMTP.
+  </div>
+
+  <h3>📦 Step 1: Create the Contact App</h3>
+  <pre><code>python manage.py startapp contact</code></pre>
+
+  <h3>⚙️ Step 2: Register the App</h3>
+  <pre><code># settings.py
+INSTALLED_APPS = [
+    ...
+    'contact',
+]</code></pre>
+
+  <h3>⚙️ Step 3: Configure SMTP Email Settings</h3>
+  <pre><code># settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'          # For Gmail SMTP
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-app-password'  # Use app password or real password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+</code></pre>
+
+  <h3>📝 Step 4: Create Contact Form</h3>
+  <pre><code># contact/forms.py
+from django import forms
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Your Name'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'placeholder': 'Your Email'}))
+    subject = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Subject'}))
+    message = forms.CharField(widget=forms.Textarea(attrs={'placeholder': 'Your message here...'}))
+</code></pre>
+
+  <pre><code># contact/forms.py
+from django import forms
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    subject = forms.CharField(max_length=150)
+    message = forms.CharField(widget=forms.Textarea)
+
+</code></pre>
+
+  <h3>👨‍💻 Step 5: Create the View</h3>
+  <pre><code># contact/views.py
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.contrib import messages
+from .forms import ContactForm
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+
+            full_message = f"Message from {name} <{email}>:\n\n{message}"
+
+            send_mail(
+                subject,
+                full_message,
+                email,  # From user email (or DEFAULT_FROM_EMAIL)
+                [ 'your-email@gmail.com' ],  # To your email
+                fail_silently=False,
+            )
+
+            messages.success(request, 'Thank you for contacting us! We will get back to you soon.')
+            return redirect('contact')
+    else:
+        form = ContactForm()
+
+    return render(request, 'contact/contact_form.html', {'form': form})
+</code></pre>
+
+<pre><code># contact/views.py
+from django.shortcuts import render
+from django.core.mail import send_mail
+from django.conf import settings
+from .forms import ContactForm
+
+def contact_view(request):
+    success = False
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            send_mail(
+                cd['subject'],
+                f"Message from {cd['name']} ({cd['email']}):\n\n{cd['message']}",
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.CONTACT_EMAIL],  # your email to receive messages
+                fail_silently=False,
+            )
+            success = True
+    else:
+        form = ContactForm()
+
+    return render(request, 'contact/contact.html', {'form': form, 'success': success})
+
+</code></pre>
+
+  <h3>🔗 Step 6: Set up URLs</h3>
+  <pre><code># contact/urls.py
+from django.urls import path
+from .views import contact_view
+
+urlpatterns = [
+    path('', contact_view, name='contact'),
+]
+
+# Include in project urls.py
+path('contact/', include('contact.urls')),
+</code></pre>
+
+  <h3>🖼️ Step 7: Create Template</h3>
+  <pre><code>
+<!-- contact/templates/contact/contact_form.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <h2>Contact Us</h2>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <button type="submit" class="btn btn-primary mt-3">Send Message</button>
+    </form>
+  </div>
+{% endblock %}
+  </code></pre>
+
+    <pre><code>
+<!-- contact/templates/contact/contact.html -->
+
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Contact Us</h1>
+
+  {% if success %}
+    <p class="alert alert-success">Thank you for your message. We will get back to you shortly.</p>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+{% endblock %}
+
+  </code></pre>
+
+  <h3>📋 Step 8: Add Message Middleware (if not enabled)</h3>
+  <pre><code># settings.py
+MIDDLEWARE = [
+    ...
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
+
+INSTALLED_APPS = [
+    ...
+    'django.contrib.messages',
+]
+
+# Also add context processors
+TEMPLATES = [
+    {
+        ...
+        'OPTIONS': {
+            'context_processors': [
+                ...
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+  </code></pre>
+
+  <h3>SMTP Settings in settings.py</h3>
+
+    <pre><code># settings.py
+        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_email_password'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+CONTACT_EMAIL = 'your_email@gmail.com'  # where contact messages get sent
+    </code></pre>
+
+  <h3>📁 Final Structure</h3>
+  <pre><code>future_bright/
+├── contact/
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── contact/
+│           └── contact_form.html
+  </code></pre>
+
+  <div class="highlight">
+    Your contact form with SMTP email sending is ready! Users can now send messages directly to your email.
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Future Bright Institute. All rights reserved.
+  </footer>
+
+</body>
+</html>

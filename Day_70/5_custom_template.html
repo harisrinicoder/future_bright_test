@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customize Django Admin Templates</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+    }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .example {
+      background-color: #f0f4f8;
+      border: 1px solid #c0d7ea;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-family: Consolas, monospace;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-family: Consolas, monospace;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">Future Bright Institute</header>
+
+  <h1>🛠️ Customizing Django Admin Layout</h1>
+
+  <div class="highlight">
+    You can override Django's default admin interface by customizing templates such as <code>base_site.html</code>. This is useful to change branding, add navigation, or insert your logo.
+  </div>
+
+  <h2>📁 Step 1: Create Folder Structure</h2>
+  <pre><code>project_root/
+├── templates/
+│   └── admin/
+│       └── base_site.html
+</code></pre>
+
+  <h2>⚙️ Step 2: Update <code>settings.py</code></h2>
+  <pre><code># settings.py
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        'DIRS': [BASE_DIR / "templates"],  # For global overrides like admin
+        'APP_DIRS': True,  # For app-specific templates
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+</code></pre>
+
+  <h2>📝 Step 3: Override <code>base_site.html</code></h2>
+  <p>Create or copy the file <code>templates/admin/base_site.html</code>:</p>
+  <pre class="example">&lt;!-- templates/admin/base_site.html --&gt;
+{% raw %}
+{% extends "admin/base.html" %}
+
+{% block title %}Future Bright Admin{% endblock %}
+
+{% block branding %}
+  &lt;h1 id="site-name"&gt;&lt;a href="/admin/"&gt;🌟 Future Bright Institute Admin Panel&lt;/a&gt;&lt;/h1&gt;
+{% endblock %}
+
+{% block nav-global %}
+  &lt;p style="padding: 10px;"&gt;Welcome Admin! You can manage everything from here.&lt;/p&gt;
+{% endblock %}
+{% endraw %}
+</pre>
+
+  <h2>🎨 Step 4: Add Your Logo or CSS</h2>
+  <p>You can load static files as well:</p>
+  <pre class="example">{% raw %}
+{% load static %}
+&lt;link rel="stylesheet" href="{% static 'css/custom_admin.css' %}"&gt;
+&lt;img src="{% static 'images/logo.png' %}" alt="Logo"&gt;
+{% endraw %}</pre>
+
+  <h3>Optional: Create a Custom CSS File</h3>
+  <pre><code>project_root/
+├── static/
+│   └── css/
+│       └── custom_admin.css
+</code></pre>
+
+  <h2>🧪 Step 5: Test It</h2>
+  <ul>
+    <li>Run the server: <code>python manage.py runserver</code></li>
+    <li>Visit: <code>http://127.0.0.1:8000/admin/</code></li>
+    <li>You should now see the custom title, header, or styling</li>
+  </ul>
+
+  <h2>📝 Optional Admin Templates You Can Override</h2>
+  <ul>
+    <li><code>base_site.html</code> — Main layout (branding)</li>
+    <li><code>login.html</code> — Custom admin login screen</li>
+    <li><code>index.html</code> — Admin dashboard page</li>
+    <li><code>change_form.html</code> — Form page for editing objects</li>
+  </ul>
+
+  <div class="highlight">
+    Customizing the admin panel allows you to reflect your brand and provide a better user experience for internal staff.
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Future Bright Institute. All rights reserved.
+  </footer>
+
+</body>
+</html>

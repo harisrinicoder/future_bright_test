@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Future Bright Institute User Authentication Guide</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.8rem; }
+    h3 { font-size: 1.5rem; }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-family: Consolas, monospace;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      body { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">Future Bright Institute</header>
+
+<h1>🔐 Django User Authentication – Future Bright Institute</h1>
+
+<div class="highlight">
+  This guide walks you through setting up user signup, login, logout, and securing blog post edits and deletions to only the owner.
+</div>
+
+<h3>📦 Step 1: Enable Django's Authentication App</h3>
+<pre>INSTALLED_APPS = [
+    ...
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    ...
+]</pre>
+
+<h3>⚙️ Step 2: Create Signup View</h3>
+<pre># users/views.py
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'users/signup.html', {'form': form})
+</pre>
+
+<h3>⚙️ Step 3: Add Login & Logout URLs</h3>
+<pre># users/urls.py
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from .views import signup_view
+
+urlpatterns = [
+    path('signup/', signup_view, name='signup'),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]</pre>
+
+<pre># fbi_project/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('users/', include('users.urls')),
+    path('blog/', include('blog.urls')),  # or your app name
+    path('', include('main.urls')),  # homepage
+]</pre>
+
+<h3>🔒 Step 4: Restrict Edit/Delete to Post Owners</h3>
+<pre># blog/views.py
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Post
+
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this post.")
+    # Handle edit logic...
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this post.")
+    # Handle deletion logic...
+</pre>
+
+<h3>📄 Step 5: Signup Template</h3>
+<pre>&lt;!-- templates/users/signup.html --&gt;
+&lt;h1&gt;Sign Up&lt;/h1&gt;
+&lt;form method="POST"&gt;
+  {% csrf_token %}
+  {{ form.as_p }}
+  &lt;button type="submit"&gt;Register&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+<h3>📄 Step 6: Login Template</h3>
+<pre>&lt;!-- templates/users/login.html --&gt;
+&lt;h1&gt;Login&lt;/h1&gt;
+&lt;form method="POST"&gt;
+  {% csrf_token %}
+  {{ form.as_p }}
+  &lt;button type="submit"&gt;Login&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+<h3>⚙️ Step 7: Update Settings</h3>
+<pre># settings.py
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+</pre>
+
+<h3>📁 Project Structure</h3>
+<pre>fbi_project/
+├── users/
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/users/
+│       ├── login.html
+│       └── signup.html
+├── blog/
+│   ├── views.py
+│   └── templates/blog/
+│       ├── post_list.html
+│       ├── edit_post.html
+│       └── delete_post.html
+├── fbi_project/
+│   └── urls.py
+</pre>
+
+<div class="highlight">
+  ✅ Users can view blog posts without login. Only authenticated users can edit or delete their own posts. All sessions and form actions are backed by Django's database and session system.
+</div>
+
+<footer class="footer">
+  &copy; 2025 Future Bright Institute. All rights reserved.
+</footer>
+
+</body>
+</html>

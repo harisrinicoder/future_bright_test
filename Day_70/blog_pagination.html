@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Future Bright Infotech Blog App Tutorial</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+    }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .example {
+      background-color: #f0f4f8;
+      border: 1px solid #c0d7ea;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">Future Bright Infotech</header>
+
+  <h1>📝 Django Blog App Tutorial</h1>
+
+  <div class="highlight">
+    Learn to build a fully functional blog app using Django! Users can create, edit, delete, and view blog posts with user authentication.
+  </div>
+
+  <h3>📦 Step 1: Create the Blog App</h3>
+  <pre><code>python manage.py startapp blog</code></pre>
+
+  <h3>⚙️ Step 2: Register the Blog App</h3>
+  <pre><code># settings.py
+INSTALLED_APPS = [
+    # ... other installed apps
+    'blog',
+]</code></pre>
+
+  <h3>🗂️ Step 3: Define the Post Model</h3>
+  <pre><code># blog/models.py
+from django.db import models
+from django.contrib.auth.models import User
+from django.urls import reverse
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
+</code></pre>
+
+  <pre><code># blog/models.py
+from django.db import models
+from django.utils import timezone
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    content = models.TextField()
+    published_at = models.DateTimeField(default=timezone.now)
+    author = models.CharField(max_length=100)  # simple author field
+
+    def __str__(self):
+        return self.title
+
+</code></pre>
+
+
+
+
+  <h3>🧱 Step 4: Run Migrations</h3>
+  <pre><code>python manage.py makemigrations
+python manage.py migrate</code></pre>
+
+  <h3>📝 Step 5: Create a Post Form</h3>
+  <pre><code># blog/forms.py
+from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
+</code></pre>
+
+  <h3>👨‍💻 Step 6: Build the Views</h3>
+  <pre><code># blog/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+from .models import Post
+from .forms import PostForm
+
+def post_list(request):
+    posts = Post.objects.order_by('-created_at')
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            new_post = form.save(commit=False)
+            new_post.author = request.user
+            new_post.save()
+            return redirect(new_post)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_form.html', {'form': form})
+
+@login_required
+def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this post.")
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect(post)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_form.html', {'form': form})
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if post.author != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this post.")
+    if request.method == 'POST':
+        post.delete()
+        return redirect('post_list')
+    return render(request, 'blog/post_confirm_delete.html', {'post': post})
+</code></pre>
+
+  <pre><code># blog/models.py
+from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.order_by('-published_at')
+    paginator = Paginator(posts, 5)  # 5 posts per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'blog/post_list.html', {'page_obj': page_obj})
+
+def post_detail(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+
+</code></pre>
+
+
+
+  <h3>🔗 Step 7: Configure URLs</h3>
+  <pre><code># blog/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/<int:pk>/', views.post_detail, name='post_detail'),
+    path('post/new/', views.post_create, name='post_create'),
+    path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
+    path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
+]
+
+# In your project’s main urls.py include:
+# path('blog/', include('blog.urls')),
+</code></pre>
+
+  <h3>🖼️ Step 8: Create Templates</h3>
+
+  <h4>blog/templates/blog/post_list.html</h4>
+  <pre><code>{% raw %}
+{% extends 'base.html' %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Blog Posts</h2>
+      
+      {% if user.is_authenticated %}
+        <a href="{% url 'post_create' %}" class="btn btn-success">Create New Post</a>
+      {% endif %}
+    </div>
+
+    {% for post in posts %}
+      <div class="mb-4">
+        <h4>{{ post.title }}</h4>
+        <p class="text-muted">by {{ post.author }} on {{ post.created_at }}</p>
+        <p>{{ post.content|truncatewords:40 }}</p>
+        <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+      </div>
+      <hr>
+    {% empty %}
+      <p>No blog posts found.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
+{% endraw %}</code></pre>
+
+<pre><code>{% extends "base.html" %}
+
+{% block content %}
+  <h1>Blog Posts</h1>
+
+  {% for post in page_obj %}
+    <article>
+      <h2><a href="{% url 'blog_post_detail' post.slug %}">{{ post.title }}</a></h2>
+      <p><small>Published: {{ post.published_at|date:"F j, Y" }}</small></p>
+      <p>{{ post.content|truncatewords:30 }}</p>
+    </article>
+    <hr>
+  {% empty %}
+    <p>No blog posts found.</p>
+  {% endfor %}
+
+  <!-- Pagination controls -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="disabled"><span>Previous</span></li>
+      {% endif %}
+
+      <li class="active"><span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+      {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="disabled"><span>Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+{% endblock %}
+</code></pre>
+
+  <h4>blog/templates/blog/post_detail.html</h4>
+  <pre><code>{% raw %}
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Blog{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    <h2>{{ post.title }}</h2>
+    <p class="text-muted">by {{ post.author }} on {{ post.created_at|date:"F j, Y, g:i a" }}</p>
+
+    <div class="mb-4">
+      {{ post.content|linebreaks }}
+    </div>
+
+    {% if user.is_authenticated %}
+      {% if user == post.author or user.is_staff %}
+        <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary me-2">Edit</a>
+        <a href="{% url 'post_delete' post.pk %}" class="btn btn-outline-danger">Delete</a>
+      {% endif %}
+    {% endif %}
+
+    <a href="{% url 'post_list' %}" class="btn btn-link mt-3">Back to all posts</a>
+  </div>
+{% endblock %}
+{% endraw %}</code></pre>
+
+  <h4>blog/templates/blog/post_form.html</h4>
+  <pre><code>{% raw %}
+{% extends "base.html" %}
+
+{% block title %}
+  {% if form.instance.pk %}
+    Edit Post - {{ form.instance.title }}
+  {% else %}
+    New Post
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    <h2>
+      {% if form.instance.pk %}
+        Edit Post
+      {% else %}
+        Create New Post
+      {% endif %}
+    </h2>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <button type="submit" class="btn btn-primary mt-3">
+        {% if form.instance.pk %}
+          Update
+        {% else %}
+          Create
+        {% endif %}
+      </button>
+
+      <a href="{% url 'post_list' %}" class="btn btn-secondary mt-3 ms-2">Cancel</a>
+    </form>
+  </div>
+{% endblock %}
+{% endraw %}</code></pre>
+
+  <h4>blog/templates/blog/post_confirm_delete.html</h4>
+  <pre><code>{% raw %}
+{% extends "base.html" %}
+
+{% block title %}Delete Post - {{ post.title }}{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    <h2>Are you sure you want to delete "{{ post.title }}"?</h2>
+    <p class="text-muted">by {{ post.author }} on {{ post.created_at|date:"F j, Y, g:i a" }}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Confirm Delete</button>
+      <a href="{% url 'post_detail' post.pk %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+  </div>
+{% endblock %}
+{% endraw %}</code></pre>
+
+  <h3>📋 Step 9: Register the Model in Admin (Optional)</h3>
+  <pre><code># blog/admin.py
+from django.contrib import admin
+from .models import Post
+
+admin.site.register(Post)
+</code></pre>
+
+  <h3>📁 Project Folder Structure</h3>
+  <pre><code>future_bright_infotech/
+├── blog/
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── templates/
+│   │   └── blog/
+│   │       ├── post_confirm_delete.html
+│   │       ├── post_detail.html
+│   │       ├── post_form.html
+│   │       └── post_list.html
+│   ├── urls.py
+│   ├── views.py
+│   └── migrations/
+│       └── __init__.py
+└── future_bright_infotech/
+    ├── settings.py
+    ├── urls.py
+    ├── wsgi.py
+    └── asgi.py
+</code></pre>
+
+  <div class="highlight">
+    🎉 Your Django blog app is ready! Users can create, edit, delete, and view posts with authentication checks.
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Future Bright Infotech. All rights reserved.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Future Bright Institute - Users App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+    }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .example {
+      background-color: #f0f4f8;
+      border: 1px solid #c0d7ea;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">Future Bright Institute</header>
+
+  <h1>🔐 Django Users App – Authentication with Signup, Login, Logout</h1>
+
+  <div class="highlight">
+    This app enables user registration, login, and logout using Django’s built-in <code>auth</code> system.
+  </div>
+
+  <h3>📦 Step 1: Create the Users App</h3>
+  <pre><code>python manage.py startapp users</code></pre>
+
+  <h3>⚙️ Step 2: Register the App</h3>
+  <pre><code># settings.py
+INSTALLED_APPS = [
+    ...
+    'users',
+    'django.contrib.auth',
+    'django.contrib.messages',
+]</code></pre>
+
+  <h3>🔧 Step 3: Update Middleware and Templates (if not done)</h3>
+  <pre><code># settings.py
+MIDDLEWARE = [
+    ...
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
+
+TEMPLATES = [
+    {
+        ...
+        'OPTIONS': {
+            'context_processors': [
+                ...
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+# Add login URL
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+</code></pre>
+
+  <h3>🧾 Step 4: Create User Registration Form</h3>
+  <pre><code># users/forms.py
+from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+</code></pre>
+
+  <h3>👥 Step 5: Create Views</h3>
+  <pre><code># users/views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import RegisterForm
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('/')
+    else:
+        form = RegisterForm()
+    return render(request, 'users/register.html', {'form': form})
+</code></pre>
+
+  <h3>🔗 Step 6: Set Up URLs</h3>
+  <pre><code># users/urls.py
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from . import views
+
+urlpatterns = [
+    path('register/', views.register_view, name='register'),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]</code></pre>
+
+  <pre><code># Include in fbi_project/urls.py
+path('accounts/', include('users.urls')),
+</code></pre>
+
+  <h3>🖼️ Step 7: Create Templates</h3>
+  <pre><code><!-- templates/users/register.html -->
+&lt;h2&gt;Register&lt;/h2&gt;
+&lt;form method="post"&gt;
+  {% csrf_token %}
+  {{ form.as_p }}
+  &lt;button type="submit"&gt;Sign Up&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+
+  <pre><code><!-- templates/users/login.html -->
+&lt;h2&gt;Login&lt;/h2&gt;
+&lt;form method="post"&gt;
+  {% csrf_token %}
+  {{ form.as_p }}
+  &lt;button type="submit"&gt;Login&lt;/button&gt;
+&lt;/form&gt;
+</code></pre>
+
+  <h3>✅ Step 8: Use Auth in Blog or Other Pages</h3>
+  <pre><code># In views.py (blog or any app)
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def create_blog_post(request):
+    ...
+</code></pre>
+
+  <div class="highlight">
+    You now have user signup, login, logout, and protected content creation using Django’s built-in authentication system.
+  </div>
+
+  <footer class="footer">
+    &copy; 2025 Future Bright Institute. All rights reserved.
+  </footer>
+
+</body>
+</html>

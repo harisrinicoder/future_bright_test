@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Django Views Explained</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fefefe;
+      color: #1f2937;
+      padding: 20px;
+      line-height: 1.6;
+      max-width: 960px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #1e40af;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+    }
+    .highlight {
+      background-color: #e0f2fe;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .example {
+      background-color: #f0f4f8;
+      border: 1px solid #c0d7ea;
+      padding: 15px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background-color: #f3f4f6;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .header, .footer {
+      background-color: #37474f;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.3em;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">Future Bright Institute</header>
+
+  <h1>🎨 Understanding Django Templates</h1>
+
+<div class="highlight">
+  Django Templates let you create dynamic HTML pages by combining HTML with Django Template Language (DTL).
+</div>
+
+<h3>📝 What is a Django Template?</h3>
+<p>
+  A template is an HTML file that contains placeholders for dynamic data. Django renders these templates by replacing placeholders with actual values passed from views.
+</p>
+
+<h3>🔧 Key Features of Django Templates</h3>
+<ul>
+  <li><strong>Template Variables:</strong> Insert dynamic data using double curly braces: <code>{{ variable_name }}</code></li>
+  <li><strong>Template Tags:</strong> Logic and control flow using tags like <code>{% if %}</code>, <code>{% for %}</code>, and <code>{% block %}</code></li>
+  <li><strong>Template Inheritance:</strong> Create base templates and extend them to reuse common layout parts.</li>
+  <li><strong>Filters:</strong> Modify variables output, e.g., <code>{{ name|upper }}</code> makes text uppercase.</li>
+</ul>
+
+<h3>📂 Example Template (home.html)</h3>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Welcome to {{ site_name }}&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello, {{ user.username }}!&lt;/h1&gt;
+
+    {% raw %}
+    {% if posts %}
+      &lt;ul&gt;
+        {% for post in posts %}
+          &lt;li&gt;{{ post.title }} - {{ post.published_date }}&lt;/li&gt;
+        {% endfor %}
+      &lt;/ul&gt;
+    {% else %}
+      &lt;p&gt;No posts found.&lt;/p&gt;
+    {% endif %}
+    {% endraw %}
+
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>🔗 How to Use Templates in Views</h3>
+<p>
+  Use Django's <code>render()</code> shortcut to load templates and pass context data:
+</p>
+<pre><code>from django.shortcuts import render
+
+def home_view(request):
+    context = {
+        'site_name': 'Future Bright Institute',
+        'user': request.user,
+        'posts': Post.objects.all(),
+    }
+    return render(request, 'home.html', context)
+</code></pre>
+
+<h3>📚 Summary</h3>
+<ul>
+  <li>Templates separate your Python logic from HTML presentation</li>
+  <li>They use DTL syntax with variables, tags, and filters</li>
+  <li>Template inheritance helps keep your code DRY (Don't Repeat Yourself)</li>
+  <li>The <code>render()</code> function sends data from views to templates</li>
+</ul>
+
+
+
+
+  <footer class="footer">
+    &copy; 2025 Future Bright Institute. All rights reserved.
+  </footer>
+
+</body>
+</html>

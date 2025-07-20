@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Future Bright{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+  <h2 class="mb-3 fw-bold">Welcome to Future Bright Infotech</h2>
+  <p class="lead mb-4 text-secondary">
+    Empowering learners through practical programming education.
+  </p>
+  <hr class="w-25 mx-auto mb-5" />
+  <p class="fs-5">
+    Explore our 
+    <a href="/courses/" class="text-primary text-decoration-underline">courses</a>, 
+    read the latest 
+    <a href="/blog/" class="text-primary text-decoration-underline">blog posts</a>, or 
+    <a href="/contact/" class="text-primary text-decoration-underline">get in touch</a>.
+  </p>
+</div>
+
+<!-- Features Section -->
+<section class="container py-5">
+  <h3 class="text-center mb-4 fw-bold">Why Choose Future Bright?</h3>
+  <div class="row text-center">
+    <div class="col-md-4 mb-4">
+      <div class="p-4 border rounded shadow-sm h-100">
+        <div class="mb-3 text-primary fs-1">💡</div>
+        <h5 class="fw-semibold mb-2">Practical Learning</h5>
+        <p class="text-muted">
+          Hands-on projects and real-world examples to build your coding skills effectively.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="p-4 border rounded shadow-sm h-100">
+        <div class="mb-3 text-primary fs-1">👩‍🏫</div>
+        <h5 class="fw-semibold mb-2">Expert Instructors</h5>
+        <p class="text-muted">
+          Learn from industry professionals with years of experience in software development.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="p-4 border rounded shadow-sm h-100">
+        <div class="mb-3 text-primary fs-1">🌐</div>
+        <h5 class="fw-semibold mb-2">Flexible & Hybrid Learning</h5>
+        <p class="text-muted">
+          Study anytime, anywhere with our online courses or join us in-person for hands-on classroom training.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Call to Action -->
+<section class="container text-center py-5">
+  <h4 class="mb-3">Ready to start your coding journey?</h4>
+  <a href="/courses/" class="btn btn-lg btn-primary px-5">Browse All Courses</a>
+</section>
+{% endblock %}

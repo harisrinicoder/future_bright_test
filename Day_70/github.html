@@ -61,7 +61,7 @@
   </div>
 
   <h3>🪜 Step 1: Initialize Git in Your Project</h3>
-  <pre><code>cd F:\fbi\future_test
+  <pre><code>cd F:\fbi\future_bright
 git init</code></pre>
 
   <h3>📝 Step 2: Add and Commit All Project Files</h3>
@@ -75,8 +75,8 @@ git commit -m "Initial commit for Future Bright project"</code></pre>
 
   <h3>🔗 Step 4: Connect Local Git to GitHub</h3>
   <pre><code>git remote add origin https://github.com/harisrinicoder/future_bright.git
-git branch -M main
-git push -u origin main</code></pre>
+git branch -M master
+git push -u origin master</code></pre>
 
   <h3>📤 Push Changes to GitHub</h3>
   <pre><code>git add .
@@ -87,14 +87,18 @@ git push</code></pre>
   <pre><code>git pull</code></pre>
 
   <h3>🚫 Optional: Add .gitignore</h3>
-  <pre><code># .gitignore file in root of project
+  <pre><code># .gitignore file in root of project (Ignore Python stuff)
 *.pyc
 __pycache__/
-db.sqlite3
+
+# Ignore environment & DB
 .env
+db.sqlite3
 *.log
-/static/
-/media/</code></pre>
+
+# Ignore only collected static/media — not your development static files
+/staticfiles/
+/mediafiles/</code></pre>
 
   <h3>✅ Final Structure</h3>
   <pre><code>future_bright/

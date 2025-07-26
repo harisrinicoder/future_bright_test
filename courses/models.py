@@ -1,6 +1,4 @@
-from django.db import models
-
-# Create your models here.
+# courses/models.py
 
 from django.db import models
 
@@ -9,9 +7,7 @@ class Course(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
     category = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='courses/images/', blank=True, null=True)  
 
     def __str__(self):
         return self.title
-
-
-

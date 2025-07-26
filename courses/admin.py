@@ -1,9 +1,8 @@
-from django.contrib import admin
+# courses/admin.py
 
-# Register your models here.
+from django.contrib import admin
 from .models import Course
 
-admin.site.register(Course)
-
-
-
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'price')

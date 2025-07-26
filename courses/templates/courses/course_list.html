@@ -3,9 +3,12 @@
 
 {% block title %}Courses{% endblock %}
 
-{% block extra_head %}
+{% block head_extra %}
   <link rel="stylesheet" href="{% static 'courses/style.css' %}">
 {% endblock %}
+
+
+
 
 {% block body_class %}course-body{% endblock %}
 
@@ -18,6 +21,11 @@
   <div class="course-container">
     {% for course in courses %}
       <div class="course-card">
+        {% if course.image %}
+        <img src="{{ course.image.url }}" alt="{{ course.title }}">
+        {% else %}    
+
+        {% endif %}
         <h4 class="course-title">{{ course.title }}</h4>
         <div class="course-meta">
           <span class="badge bg-primary">{{ course.category }}</span>

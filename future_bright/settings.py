@@ -81,13 +81,20 @@ WSGI_APPLICATION = "future_bright.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "future_bright",          # Your PostgreSQL database name
+        "USER": "postgres",               # PostgreSQL username
+        "PASSWORD": "hari123456",         # PostgreSQL password
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -112,10 +119,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
-# LANGUAGE_CODE = 'en-gb' # Uncomment for British English
-
-# TIME_ZONE = 'Asia/Kolkata' # Uncomment for Indian Standard Time
 
 TIME_ZONE = "UTC"
 
@@ -145,3 +148,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = '/'          # Redirect after login
 LOGOUT_REDIRECT_URL = '/accounts/login/'  # Redirect after logout
 
+# Media files 
+
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

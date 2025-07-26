@@ -8,7 +8,7 @@
 
 /* Headings */
 .course-heading {
-    color: #1e3a8a;
+    color: #030a1e;
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
 }
@@ -41,6 +41,17 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.course-card img {
+    width: 100%;
+    max-width: 100%;         
+    height: 400px;            
+    object-fit: cover;       
+    border-radius: 10px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+
 .course-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
@@ -72,3 +83,5 @@
     font-size: 0.95rem;
     line-height: 1.5;
 }
+
+

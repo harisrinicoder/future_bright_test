@@ -70,22 +70,29 @@ TEMPLATES = [
 WSGI_APPLICATION = "future_bright.wsgi.application"
 
 # Database configuration
-if ENVIRONMENT == 'production':
-    DATABASE_URL = env('DATABASE_URL')  # This must be set in Render
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "future_bright",
-            "USER": "postgres",
-            "PASSWORD": "hari123456",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
-    }
+# if ENVIRONMENT == 'production':
+#     DATABASE_URL = env('DATABASE_URL')  # This must be set in Render
+#     DATABASES = {
+#         'default': dj_database_url.parse(DATABASE_URL)
+#     }
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.postgresql",
+#             "NAME": "future_bright",
+#             "USER": "postgres",
+#             "PASSWORD": "hari123456",
+#             "HOST": "localhost",
+#             "PORT": "5432",
+#         }
+#     }
+
+# Database configuration (use Render PostgreSQL always)
+DATABASE_URL = env('DATABASE_URL')  # Set this in both local and Render environments
+DATABASES = {
+    'default': dj_database_url.parse(DATABASE_URL)
+}
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -108,6 +115,16 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+
+# Use Cloudinary for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Cloudinary credentials (you can also load from environment variables)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUD_NAME')  ,
+    'API_KEY': env('API_KEY')  ,
+    'API_SECRET': env('API_SECRET')  ,
+}
 
 # Static files
 STATIC_URL = "/static/"

@@ -70,22 +70,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "future_bright.wsgi.application"
 
 # Database configuration
-# if ENVIRONMENT == 'production':
-#     DATABASE_URL = env('DATABASE_URL')  # This must be set in Render
-#     DATABASES = {
-#         'default': dj_database_url.parse(DATABASE_URL)
-#     }
-# else:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.postgresql",
-#             "NAME": "future_bright",
-#             "USER": "postgres",
-#             "PASSWORD": "hari123456",
-#             "HOST": "localhost",
-#             "PORT": "5432",
-#         }
-#     }
 
 # Database configuration (use Render PostgreSQL always)
 DATABASE_URL = env('DATABASE_URL')  # Set this in both local and Render environments
